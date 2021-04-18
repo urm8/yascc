@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "stringcase"
+name = "yacc"
 version = "0.1.0"
 description = "swap cases"
 authors = ["urm8"]
 license = "LICENCE"
 packages = [
-    { include = "src/*.py" }
+    { include = "yacc", from="src" }
 ]
 build = "build.py"
 
