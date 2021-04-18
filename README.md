@@ -1,5 +1,7 @@
 # YACC (Yet another case converter)
 
+Just wanted to shave off extra seconds from standard regex based camelcase to snakecase conversion implementation
+
 ```
 pip install yacc
 ```
