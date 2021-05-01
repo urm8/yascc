@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the action will run. 
@@ -14,17 +12,18 @@ on:
   workflow_dispatch:
 
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ubuntu-latest
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-18.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v1
+        uses: JRubics/poetry-publish@v1.6
         with:
-          python_version: '3.6.13'
-          poetry_version: '==1.1.5'  # (PIP version specifier syntax)
+          python-version: ${{ matrix.python-version }}
           pypi_token: ${{ secrets.PYPI_TOKEN }}
-          
