@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-18.04, macos-latest, windows-latest]
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        os: [ ubuntu-18.04, macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -29,5 +29,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
       - name: Setup poetry
         run: poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      - name: Build
+        run: poetry build -f wheel
       - name: Publish
-        run: poetry publish --build
+        run: poetry publish
