@@ -13,7 +13,7 @@ on:
 
 
 jobs:
-  ci:
+  wheels:
     strategy:
       fail-fast: false
       matrix:
@@ -34,4 +34,23 @@ jobs:
       - name: Publish
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
-          poetry publish --build
+          poetry build -f wheel
+          poetry publish
+  tar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Setup poetry
+        uses: abatilo/actions-poetry@v2.1.2
+      - name: Install
+        run: |
+          poetry install
+      - name: Publish
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+          poetry build -f sdist
+          poetry publish
