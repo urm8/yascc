@@ -5,12 +5,13 @@ description = "swap cases"
 authors = ["urm8"]
 license = "LICENCE"
 packages = [
-    { include = "yascc", from="src" }
+    { include = "yascc", from = "src" }
 ]
 build = "build.py"
 
 [tool.poetry.dependencies]
 python = "^3.6 || ^3.7 || ^3.8 || ^3.9"
+importlib-metadata = { version = "*", python = "<3.8" }
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"

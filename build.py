@@ -2,7 +2,6 @@ from distutils.core import Extension
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from distutils.command.build_ext import build_ext
 
-
 ext_modules = [
     Extension("_case", sources=["src/case.c"]),
 ]
@@ -30,8 +29,6 @@ def build(setup_kwargs):
     """
     This function is mandatory in order to build the extensions.
     """
-    import pprint
-    pprint.pprint(setup_kwargs, width=80, depth=4)
     setup_kwargs.update(
         {"ext_modules": ext_modules, "cmdclass": {"build_ext": ExtBuilder}}
     )
