@@ -1,5 +1,5 @@
 """
-YET ANOTHER STRING CASE CONVERTEr
+YET ANOTHER STRING CASE CONVERTER
 """
 try:
     import importlib.metadata as importlib_metadata

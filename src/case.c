@@ -7,46 +7,39 @@ typedef enum
     true
 } bool;
 
-static inline void to_snake_case(char *src, char *dest)
+char *buf[4096];
+const char *del = "_";
+
+static inline void to_snake_case(char *in)
 {
-    size_t dest_n = 0;
-    for (size_t ch_n = 0; ch_n < strlen(src); ch_n++)
-    {
-        char ch = *(src + ch_n);
-        if (isupper(ch))
-        {
-            if (ch_n)
-            {
-                *(dest + dest_n) = '_';
-                dest_n++;
-            }
-            ch = tolower(ch);
-        }
-        *(dest + dest_n) = ch;
-        dest_n++;
+    strcpy(buf, in);
+    char *t = buf;
+    char *s = in;
+    char l;
+    while (*s) {
+        l = tolower(*s);
+        if (l != *s)
+          *(t++) = '_';
+        *(t++) = l;
+        s++;
     }
-    dest[dest_n] = 0;
 }
 
-static inline void to_camel_case(char *src, char *dest)
+static inline void to_camel_case(char *in)
 {
-    size_t dest_n = 0;
-    bool prev_u = false;
-    for (size_t ch_n = 0; ch_n < strlen(src); ch_n++)
+  strcpy (buf, in);
+  char *t = buf;
+  char *token = strtok (buf, del);
+  while (token != NULL)
     {
-        char ch = *(src + ch_n);
-        if (ch != '_')
-        {
-            *(dest + dest_n) = prev_u ? toupper(ch) : ch;
-            prev_u = false;
-            dest_n++;
-        }
-        else
-        {
-            prev_u = true;
-        }
+      while (*token) {
+          	*(t++) = *(token++);
+      }
+      token = strtok (NULL, del);
+      if (token != NULL)
+        *token = toupper (*token);
     }
-    dest[dest_n] = 0;
+    *t = 0;
 }
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
@@ -54,10 +47,8 @@ static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
     char *camel_case_str;
     if (!PyArg_ParseTuple(args, "s", &camel_case_str))
         return NULL;
-    char *snake_str = calloc(strlen(camel_case_str) * 2, sizeof(char));
-    to_snake_case(camel_case_str, snake_str);
-    PyObject *obj = PyUnicode_FromString(snake_str);
-    free(snake_str);
+    to_snake_case(camel_case_str);
+    PyObject *obj = PyUnicode_FromString(buf);
     return obj;
 }
 
@@ -66,10 +57,8 @@ static PyObject *snakecase_to_camel_case(PyObject *self, PyObject *args)
     char *snake_case_str;
     if (!PyArg_ParseTuple(args, "s", &snake_case_str))
         return NULL;
-    char *camel_case_str = calloc(strlen(snake_case_str) * 2, sizeof(char));
-    to_camel_case(snake_case_str, camel_case_str);
-    PyObject *obj = PyUnicode_FromString(camel_case_str);
-    free(camel_case_str);
+    to_camel_case(snake_case_str);
+    PyObject *obj = PyUnicode_FromString(buf);
     return obj;
 }
 
