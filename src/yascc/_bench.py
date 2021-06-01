@@ -3,7 +3,7 @@ import timeit
 from functools import partial
 
 
-def _bench(module, test_string="thisIsVeryEasyString", number=100_000):
+def _bench(module, test_string="thisIsVeryEasyString", number=5_000_000):
     getter = partial(getattr, module)
     for attr in dir(module):
         if not attr.startswith("to_"):
