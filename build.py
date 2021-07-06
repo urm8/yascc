@@ -3,7 +3,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatfo
 from distutils.command.build_ext import build_ext
 
 ext_modules = [
-    Extension("_case", sources=["src/case.c"]),
+    Extension("_case", sources=["yascc/case.c"], extra_compile_args=['-Wno-xxxx']),
 ]
 
 

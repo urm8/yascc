@@ -7,11 +7,11 @@ from _case import _to_snake_case
 
 
 def to_snake_case(src: str) -> str:
-    return _to_snake_case(src)
+    return str(_to_snake_case(src))
 
 
 def decamelize(d: Union[dict[str, Any], list[Any]]) -> Union[dict[str, Any], list[Any]]:
-    return apply(_to_snake_case, d)
+    return apply(to_snake_case, d)
 
 
 if __name__ == "__main__":

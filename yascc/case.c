@@ -23,6 +23,7 @@ static inline void to_snake_case(char *in)
         *(t++) = l;
         s++;
     }
+    *t = NULL;
 }
 
 static inline void to_camel_case(char *in)
@@ -39,7 +40,7 @@ static inline void to_camel_case(char *in)
       if (token != NULL)
         *token = toupper (*token);
     }
-    *t = 0;
+    *t = NULL;
 }
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
