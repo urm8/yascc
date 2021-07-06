@@ -4,13 +4,15 @@ from typing import Any
 
 from _case import _to_camel_case
 
+from .common import apply
+
 
 def to_camel_case(snake_case_string: str) -> str:
-    return _to_camel_case(snake_case_string)
+    return str(_to_camel_case(snake_case_string))
 
 
 def camelize(d: dict[str, Any]) -> dict[str, Any]:
-    return {_to_camel_case(key): value for key, value in d.items()}
+    return apply(to_camel_case, d)
 
 
 if __name__ == "__main__":
