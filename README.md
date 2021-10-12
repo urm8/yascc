@@ -1,9 +1,9 @@
-# YACC (Yet another case converter)
+# YACC (Yet another case converter) [![PyPI version](https://badge.fury.io/py/yascc.svg)](https://badge.fury.io/py/yascc)
 
 Just wanted to shave off extra seconds from standard regex based camelcase to snakecase conversion implementation
 
 ```
-pip install yacc
+pip install yascc
 ```
 
 example usage:
