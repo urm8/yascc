@@ -14,9 +14,3 @@ def decamelize(d: Union[dict[str, Any], list[Any]]) -> Union[dict[str, Any], lis
     return apply(to_snake_case, d)
 
 
-if __name__ == "__main__":
-    import sys
-
-    from _bench import _bench
-
-    _bench(sys.modules[__name__])

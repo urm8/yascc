@@ -1,10 +1,16 @@
-from functools import partial
-from typing import Callable, Union
+from typing import Callable, Union, Any, MutableMapping, MutableSequence
 
 
-def apply(function: Callable[[str], str], obj: Union[dict, list]) -> Union[dict, list]:
-    if not isinstance(obj, dict):
-        if isinstance(obj, list):
-            return [*map(partial(apply, function), obj)]
-        return obj
-    return {function(key): apply(function, value) for key, value in obj.items()}
+def apply(function: Callable[[str], str], obj: Union[MutableMapping, MutableSequence, Any]) -> Union[
+    MutableMapping, MutableSequence]:
+    to_visit = [obj]
+    while to_visit:
+        candidate = to_visit.pop()
+        if isinstance(candidate, MutableMapping):
+            for key in [*candidate]:
+                value = candidate[function(key)] = candidate[key]
+                to_visit.append(value)
+                del candidate[key]
+        elif isinstance(candidate, MutableSequence):
+            to_visit.extend(candidate)
+    return obj

@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "yascc"
-version = "0.2.2"
+version = "0.2.7"
 description = "swap cases"
 authors = ["urm8"]
 license = "LICENCE"
 packages = [
-    { include = "yascc" }
+    { include = "yascc", format = "sdist" }
 ]
 build = "build.py"
 
@@ -13,6 +13,7 @@ build = "build.py"
 python = "^3.6 || ^3.7 || ^3.8 || ^3.9 || ^3.10"
 importlib-metadata = { version = "*", python = "<3.8" }
 setuptools = "^60.5.0"
+pytest-benchmark = "^3.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
@@ -20,9 +21,6 @@ black = "^20.8b1"
 pylint = "^2.7.4"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1", "setuptools>=60"]
 build-backend = "poetry.core.masonry.api"
 
-
-[tool.poetry.scripts]
-pypi = "publish"
