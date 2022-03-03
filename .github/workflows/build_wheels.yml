@@ -23,20 +23,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-20.04, windows-2019, macos-10.15]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
         include:
           - os: ubuntu-20.04
-            archs: "x86_64, i686"
-          - os: ubuntu-20.04
-            archs: "aarch64"
-          - os: ubuntu-20.04
-            archs: "ppc64le"
-          - os: ubuntu-20.04
-            archs: "s390x"
+            archs: "x86_64, i686, aarch64"
           - os: windows-2019
-            archs: "AMD64"
-          - os: windows-2019
-            archs: "x86"
+            archs: "AMD64, x86"
           - os: macos-10.15
             archs: "x86_64, arm64"
 
