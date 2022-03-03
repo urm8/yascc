@@ -15,5 +15,5 @@ example usage:
 >>> from yacc import snakecase
 >>> snakecase.to_camel_case('yet_another_case_converter')
 'yetAnotherCaseConverter'
->>> 
+>>>
 ```
