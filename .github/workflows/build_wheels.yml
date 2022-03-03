@@ -90,7 +90,7 @@ jobs:
       - name: Setup PDM
         uses: pdm-project/setup-pdm@main
         with:
-          python-version: ${{ matrix.python-version }} # Version range or exact version of a Python version to use, the same as actions/setup-python
+          python-version: 3.7 # Version range or exact version of a Python version to use, the same as actions/setup-python
           version: 1.13.3 # The version of PDM to install. Leave it as empty to use the latest version from PyPI
           enable-pep582: true # Enable PEP 582 package loading globally
 

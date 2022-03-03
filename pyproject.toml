@@ -48,7 +48,7 @@ test-command = "pytest --pyargs yascc"
 
 [project]
 name = "yascc"
-version = "0.3.0"
+version = "0.3.1"
 description = ""
 authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]
 dependencies = []
