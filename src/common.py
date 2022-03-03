@@ -1,8 +1,14 @@
-from typing import Callable, Union, Any, MutableMapping, MutableSequence
+from typing import Any
+from typing import Callable
+from typing import MutableMapping
+from typing import MutableSequence
+from typing import TypeVar
+from typing import Union
+
+T = TypeVar("T", bound=Union[MutableMapping, MutableSequence, Any])
 
 
-def apply(function: Callable[[str], str], obj: Union[MutableMapping, MutableSequence, Any]) -> Union[
-    MutableMapping, MutableSequence]:
+def apply(function: Callable[[str], str], obj: T) -> T:
     to_visit = [obj]
     while to_visit:
         candidate = to_visit.pop()

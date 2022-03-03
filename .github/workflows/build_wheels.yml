@@ -1,0 +1,130 @@
+name: bnd
+
+on:
+  push:
+    tags:
+      - "**"
+    branches-ignore:
+      - "dependabot/**"
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v2.0.3
+
+  build_wheels:
+    name: Build ${{ matrix.archs }} wheels on ${{ matrix.os }}
+    needs: [lint]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10]
+        include:
+          - os: ubuntu-20.04
+            archs: "x86_64, i686"
+          - os: ubuntu-20.04
+            archs: "aarch64"
+          - os: ubuntu-20.04
+            archs: "ppc64le"
+          - os: ubuntu-20.04
+            archs: "s390x"
+          - os: windows-2019
+            archs: "AMD64"
+          - os: windows-2019
+            archs: "x86"
+          - os: macos-10.15
+            archs: "x86_64, arm64"
+
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+        if: runner.os == 'Linux'
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@main
+        with:
+          python-version: ${{ matrix.python-version }} # Version range or exact version of a Python version to use, the same as actions/setup-python
+          version: 1.13.3 # The version of PDM to install. Leave it as empty to use the latest version from PyPI
+          enable-pep582: true # Enable PEP 582 package loading globally
+
+      - name: Install dependencies
+        run: |
+          pdm install
+          pdm build --no-sdist
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    needs: [lint]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v3
+        name: Install Python
+        with:
+          python-version: "3.7"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@main
+        with:
+          python-version: ${{ matrix.python-version }} # Version range or exact version of a Python version to use, the same as actions/setup-python
+          version: 1.13.3 # The version of PDM to install. Leave it as empty to use the latest version from PyPI
+          enable-pep582: true # Enable PEP 582 package loading globally
+
+      - name: Build sdist
+        run: pdm build --no-wheel
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.tar.gz
+
+  upload_pypi:
+    name: Upload to (Test) PyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push' && github.repository == 'urm8/yascc'
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - name: Upload to Test PyPI
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_test_password }}
+          skip_existing: true
+          repository_url: https://test.pypi.org/legacy/
+
+      - name: Upload to PyPI
+        # upload to PyPI on every tag starting with 'v'
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_release_password }}
+          skip_existing: true

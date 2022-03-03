@@ -1,0 +1,5 @@
+[flake8]
+exclude = __pycache__,build,dist,__pypackages__
+max-complexity = 12
+max-line-length = 120
+jobs = 4

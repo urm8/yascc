@@ -1,26 +1,58 @@
-[tool.poetry]
-name = "yascc"
-version = "0.2.7"
-description = "swap cases"
-authors = ["urm8"]
-license = "LICENCE"
-packages = [
-    { include = "yascc", format = "sdist" }
-]
+[tool.pdm]
 build = "build.py"
-
-[tool.poetry.dependencies]
-python = "^3.6 || ^3.7 || ^3.8 || ^3.9 || ^3.10"
-importlib-metadata = { version = "*", python = "<3.8" }
-setuptools = "^60.5.0"
-pytest-benchmark = "^3.4.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.3"
-black = "^20.8b1"
-pylint = "^2.7.4"
-
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.0.1",
+    "cibuildwheel>=2.3.1",
+    "pre-commit>=2.17.0",
+]
 [build-system]
-requires = ["poetry-core>=1", "setuptools>=60"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
 
+[tool.black]
+addopts = '--fast'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | manage.py           # also separately exclude a file named foo.py in
+)
+'''
+line-length = 119
+target_version = ['py37']
+
+[tool.isort]
+known_third_party = ["pytest"]
+line_length = 119
+profile = "black"
+skip_gitignore = "True"
+force_single_line = "True"
+
+[tool.cibuildwheel]
+test-requires = "pytest"
+test-command = "pytest --pyargs yascc"
+
+[project]
+name = "yascc"
+version = "0.3.0"
+description = ""
+authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]
+dependencies = []
+requires-python = ">=3.7"
+license = { text = "DTFYW" }
+
+[project.urls]
+Homepage = ""
+
+[project.optional-dependencies]

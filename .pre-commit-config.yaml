@@ -1,0 +1,69 @@
+---
+exclude: migrations|templates|totals_prices_sql.md
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-ast
+      - id: sort-simple-yaml
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        args:
+          [
+            -i,
+            --remove-all-unused-imports,
+            --ignore-init-module-imports,
+            --expand-star-imports,
+            --remove-duplicate-keys,
+          ]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        args: [ --settings-file, pyproject.toml ]
+  - repo: https://github.com/psf/black
+    rev: 22.1.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [ --config, pyproject.toml ]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.31.0
+    hooks:
+      - id: pyupgrade
+        files: yascc
+        args: [ --py3-plus, --py36-plus, --py37-plus]
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0  # Use the ref you want to point at
+    hooks:
+      - id: python-check-mock-methods
+      - id: python-no-log-warn
+      - id: python-use-type-annotations
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.3.0
+    hooks:
+      - id: yesqa
+  - repo: https://github.com/pycqa/flake8
+    rev: "4.0.1" # pick a git hash / tag to point to
+    hooks:
+      - id: flake8
+        files: ^yascc/
+        args: [ "--config", ".flake8", "--exit-zero" ] # for now
+        verbose: true
+        additional_dependencies:
+          - flake8-eradicate
+          - flake8-comprehensions
+          - flake8-print
+          - flake8-simplify
+          - flake8-todo
+          - radon
+        always_run: true

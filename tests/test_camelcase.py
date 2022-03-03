@@ -1,5 +1,3 @@
-import pytest
-
 from yascc.camelcase import decamelize
 
 
