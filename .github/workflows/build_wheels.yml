@@ -55,7 +55,6 @@ jobs:
 
       - name: Build wheel
         run: |
-          pdm install
           pdm build --no-sdist
 
       - uses: actions/upload-artifact@v2
@@ -84,7 +83,6 @@ jobs:
 
       - name: Build sdist
         run: |
-          pdm install
           pdm build --no-wheel
 
       - uses: actions/upload-artifact@v2
