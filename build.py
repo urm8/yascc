@@ -1,4 +1,5 @@
 import logging
+import sys
 from distutils.command.build_ext import build_ext
 from distutils.core import Extension
 from distutils.errors import CCompilerError
@@ -8,7 +9,7 @@ from distutils.errors import DistutilsPlatformError
 log = logging.getLogger(__name__)
 
 ext_modules = [
-    Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=["-Wno-xxxx"]),
+    Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=["-O3" if sys.platform == "win32" else "Ox"]),
 ]
 
 
