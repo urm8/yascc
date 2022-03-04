@@ -44,8 +44,6 @@ force_single_line = "True"
 
 [tool.cibuildwheel]
 build = "*"
-test-requires = "pytest"
-test-command = "pytest --pyargs tests"
 
 [project]
 name = "yascc"
