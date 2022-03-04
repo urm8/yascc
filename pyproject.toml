@@ -6,6 +6,7 @@ dev = [
     "pytest>=7.0.1",
     "cibuildwheel>=2.3.1",
     "pre-commit>=2.17.0",
+    "pytest-benchmark>=3.4.1",
 ]
 
 [tool.pdm.scripts]
@@ -48,7 +49,7 @@ build = "*"
 
 [project]
 name = "yascc"
-version = "0.3.1"
+version = "0.3.3"
 description = "Yet another string case converter"
 readme = "README.md"
 authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]

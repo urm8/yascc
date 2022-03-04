@@ -8,39 +8,36 @@ typedef enum
 } bool;
 
 char *buf[4096];
-const char *del = "_";
+const char del = '_';
 
 static inline void to_snake_case(char *in)
 {
-    strcpy(buf, in);
-    char *t = buf;
-    char *s = in;
+    char *target = buf;
+    char *source = in;
     char l;
-    while (*s) {
-        l = tolower(*s);
-        if (l != *s)
-          *(t++) = '_';
-        *(t++) = l;
-        s++;
+    while (*source)
+    {
+        l = tolower(*source);
+        if (l != *source)
+            *(target++) = '_';
+        *(target++) = l;
+        source++;
     }
-    *t = NULL;
+    *target = NULL;
 }
 
 static inline void to_camel_case(char *in)
 {
-  strcpy (buf, in);
-  char *t = buf;
-  char *token = strtok (buf, del);
-  while (token != NULL)
+    char *target = buf;
+    *target = NULL;
+    for (char *l = in; l != NULL; l++)
     {
-      while (*token) {
-          	*(t++) = *(token++);
-      }
-      token = strtok (NULL, del);
-      if (token != NULL)
-        *token = toupper (*token);
+        if (target == del)
+            *(target++) = toupper(l);
+        else
+            *(target++) = l;
     }
-    *t = NULL;
+    *target = NULL;
 }
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
