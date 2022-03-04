@@ -8,7 +8,7 @@ from distutils.errors import DistutilsPlatformError
 log = logging.getLogger(__name__)
 
 ext_modules = [
-    Extension("_case", sources=["src/case.c"], extra_compile_args=["-Wno-xxxx"]),
+    Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=["-Wno-xxxx"]),
 ]
 
 
