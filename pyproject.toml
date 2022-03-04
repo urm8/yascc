@@ -55,6 +55,6 @@ requires-python = ">=3.7"
 license = { text = "DTFYW" }
 
 [project.urls]
-Homepage = ""
+Homepage = "https://github.com/urm8/yascc"
 
 [project.optional-dependencies]
