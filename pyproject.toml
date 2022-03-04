@@ -10,7 +10,7 @@ dev = [
 [tool.pdm.scripts]
 lint = 'pre-commit'
 [build-system]
-requires = ["pdm-pep517"]
+requires = ["pdm-pep517", "setuptools>=42", "wheel"]
 build-backend = "pdm.pep517.api"
 
 [tool.black]
@@ -43,6 +43,7 @@ skip_gitignore = "True"
 force_single_line = "True"
 
 [tool.cibuildwheel]
+build = "*"
 test-requires = "pytest"
 test-command = "pytest --pyargs yascc"
 
