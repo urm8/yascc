@@ -1,5 +1,6 @@
 [tool.pdm]
 build = "build.py"
+source-includes = ["tests", "LICENSE", "README.md"]
 [tool.pdm.dev-dependencies]
 dev = [
     "pytest>=7.0.1",
@@ -48,13 +49,25 @@ build = "*"
 [project]
 name = "yascc"
 version = "0.3.1"
-description = ""
+description = "Yet another string case converter"
+readme = "README.md"
 authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]
 dependencies = []
 requires-python = ">=3.7"
 license = { text = "DTFYW" }
+classifiers = [
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+
 
 [project.urls]
 Homepage = "https://github.com/urm8/yascc"
+Repository = "https://github.com/urm8/yascc"
+
 
 [project.optional-dependencies]
