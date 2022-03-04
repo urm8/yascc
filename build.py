@@ -8,8 +8,14 @@ from distutils.errors import DistutilsPlatformError
 
 log = logging.getLogger(__name__)
 
+args = []
+if sys.platform == "win32":
+    args.append("/Ox")
+else:
+    args.append("-O3")
+
 ext_modules = [
-    Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=["-O3" if sys.platform == "win32" else "Ox"]),
+    Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=args),
 ]
 
 
