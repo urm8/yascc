@@ -7,7 +7,7 @@ typedef enum
     true
 } bool;
 
-char *buf[4096];
+char buf[4096];
 const char del = '_';
 
 static inline void to_snake_case(char *in)
@@ -30,14 +30,17 @@ static inline void to_camel_case(char *in)
 {
     char *target = buf;
     *target = NULL;
-    for (char *l = in; l != NULL; l++)
+    char ch;
+    while (ch)
     {
-        if (target == del)
-            *(target++) = toupper(l);
-        else
-            *(target++) = l;
+        ch = *(in++);
+        if (ch != del)
+            *(target++) = ch;
+        else {
+            ch = *(in++);
+            *(target++) = toupper(ch);
+        }
     }
-    *target = NULL;
 }
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
