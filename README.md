@@ -9,10 +9,10 @@ pip install yascc
 example usage:
 
 ```
->>> from yacc import camelcase
+>>> from yascc import camelcase
 >>> camelcase.to_snake_case('yetAnotherCaseConverter')
 'yet_another_case_converter'
->>> from yacc import snakecase
+>>> from yascc import snakecase
 >>> snakecase.to_camel_case('yet_another_case_converter')
 'yetAnotherCaseConverter'
 >>>
