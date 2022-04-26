@@ -23,24 +23,22 @@ static inline void to_snake_case(char *in)
         *(target++) = l;
         source++;
     }
-    *target = NULL;
+    *target = '\0';
 }
 
 static inline void to_camel_case(char *in)
 {
     char *target = buf;
-    *target = NULL;
     char ch;
-    while (ch)
+    do
     {
         ch = *(in++);
-        if (ch != del)
-            *(target++) = ch;
-        else {
-            ch = *(in++);
-            *(target++) = toupper(ch);
+        if (ch == del) {
+            ch = toupper(*(in++));
         }
-    }
+        *(target++) = ch;
+    } while(ch);
+    *target = '\0';
 }
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)

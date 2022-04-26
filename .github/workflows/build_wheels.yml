@@ -25,21 +25,17 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            archs: "x86_64, i686"
-          - os: ubuntu-20.04
-            archs: "aarch64"
+            archs: "x86_64 aarch64"
           - os: windows-2019
-            archs: "AMD64"
-          - os: windows-2019
-            archs: "x86"
+            archs: "AMD64 x86"
           - os: macos-10.15
-            archs: "x86_64, arm64"
+            archs: "x86_64 arm64"
     env:
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_24
       CIBW_MANYLINUX_I686_IMAGE: manylinux_2_24
       CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_24
       CIBW_MANYLINUX_PPC64LE_IMAGE: manylinux_2_24
-      CIBW_ARCHS_LINUX: auto aarch64 ppc64le
+      CIBW_ARCHS_LINUX: auto aarch64
       CIBW_BUILD_VERBOSITY: 2
     steps:
       - name: Set git to use LF
