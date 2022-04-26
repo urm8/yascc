@@ -11,6 +11,7 @@ dev = [
 
 [tool.pdm.scripts]
 lint = 'pre-commit'
+test = 'pytest .'
 [build-system]
 requires = ["setuptools>=61", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
@@ -49,7 +50,7 @@ build = "*"
 
 [project]
 name = "yascc"
-version = "0.3.9"
+version = "0.3.10"
 description = "Yet another string case converter"
 readme = "README.md"
 authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]
