@@ -34,6 +34,11 @@ def decamelized_nested_dict():
 
 
 @pytest.fixture
+def decamelized_list_of_dict(decamelized_nested_dict):
+    return [decamelized_nested_dict]
+
+
+@pytest.fixture
 def camelized_nested_dict():
     return deepcopy(
         {
@@ -51,3 +56,8 @@ def camelized_nested_dict():
             "metadata": {"filters": {"proposals": {}}, "eggs": [{"1": "rabbit"}, {"2": "snake"}]},
         }
     )
+
+
+@pytest.fixture
+def camelized_list_of_dict(camelized_nested_dict):
+    return [camelized_nested_dict]

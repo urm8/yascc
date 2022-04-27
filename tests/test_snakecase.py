@@ -15,5 +15,9 @@ def test_camelize_nested_dict(decamelized_nested_dict, camelized_nested_dict) ->
 
 
 @pytest.mark.parametrize("impl", [snakecase.camelize, camelize], ids=["c", "drf"])
-def test_camelize_benchmark(benchmark, decamelized_dict, impl):
-    benchmark(impl, decamelized_dict)
+def test_camelize_benchmark(benchmark, decamelized_list_of_dict, impl):
+    benchmark(impl, decamelized_list_of_dict)
+
+
+def test_decamelize_list_of_dict(decamelized_list_of_dict, camelized_list_of_dict) -> None:
+    assert snakecase.camelize(decamelized_list_of_dict) == camelized_list_of_dict
