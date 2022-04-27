@@ -1,4 +1,9 @@
 #define PY_SSIZE_T_CLEAN
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stack.h>
 #include <Python.h>
 
 typedef enum
@@ -33,11 +38,12 @@ static inline void to_camel_case(char *in)
     do
     {
         ch = *(in++);
-        if (ch == del) {
+        if (ch == del)
+        {
             ch = toupper(*(in++));
         }
         *(target++) = ch;
-    } while(ch);
+    } while (ch);
     *target = '\0';
 }
 
@@ -61,15 +67,116 @@ static PyObject *snakecase_to_camel_case(PyObject *self, PyObject *args)
     return obj;
 }
 
+static PyObject *camelize(PyObject *self, PyObject *args)
+{
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args, "O", &obj))
+        return NULL;
+    Stack_T stack = Stack_init();
+    Stack_push(stack, Py_NewRef(obj));
+    while (!Stack_empty(stack))
+    {
+        PyObject *candidate = (PyObject *)Stack_pop(stack);
+        if (PyDict_Check(candidate))
+        {
+            PyObject *keys = PyDict_Keys(candidate);
+            int keys_len = PySequence_Length(keys);
+            for (int i = 0; i < keys_len; i++)
+            {
+                PyObject *key = PyList_GET_ITEM(keys, i);
+                PyObject *value = PyDict_GetItem(candidate, key);
+
+                if (PyUnicode_Check(key))
+                {
+                    const char *key_str = PyUnicode_AsUTF8(key);
+                    to_camel_case((char *)key_str);
+                    PyObject *new_key = PyUnicode_FromString(buf);
+                    value = Py_NewRef(value);
+                    PyDict_DelItem(candidate, key);
+                    PyDict_SetItem(candidate, new_key, value);
+                    Py_DECREF(new_key);
+                    Py_DECREF(value);
+                }
+                if (PyDict_Check(value) || PyList_Check(value))
+                {
+                    Stack_push(stack, value);
+                }
+            }
+            Py_DECREF(keys);
+        }
+        else if (PyList_Check(candidate))
+        {
+            Py_ssize_t size = PyList_GET_SIZE(candidate);
+            for (int i = 0; i < size; i++)
+            {
+                Stack_push(stack, PyList_GET_ITEM(candidate, i));
+            }
+        }
+    }
+    free(stack);
+    return obj;
+}
+static PyObject *decamelize(PyObject *self, PyObject *args)
+{
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args, "O", &obj))
+        return NULL;
+    Stack_T stack = Stack_init();
+    Stack_push(stack, Py_NewRef(obj));
+    while (!Stack_empty(stack))
+    {
+        PyObject *candidate = (PyObject *)Stack_pop(stack);
+        if (PyDict_Check(candidate))
+        {
+            PyObject *keys = PyDict_Keys(candidate);
+            int keys_len = PySequence_Length(keys);
+            for (int i = 0; i < keys_len; i++)
+            {
+                PyObject *key = PyList_GET_ITEM(keys, i);
+                PyObject *value = PyDict_GetItem(candidate, key);
+
+                if (PyUnicode_Check(key))
+                {
+                    const char *key_str = PyUnicode_AsUTF8(key);
+                    to_snake_case((char *)key_str);
+                    PyObject *new_key = PyUnicode_FromString(buf);
+                    value = Py_NewRef(value);
+                    PyDict_DelItem(candidate, key);
+                    PyDict_SetItem(candidate, new_key, value);
+                    Py_DECREF(new_key);
+                    Py_DECREF(value);
+                }
+                if (PyDict_Check(value) || PyList_Check(value))
+                {
+                    Stack_push(stack, value);
+                }
+            }
+            Py_DECREF(keys);
+        }
+        else if (PyList_Check(candidate))
+        {
+            Py_ssize_t size = PyList_GET_SIZE(candidate);
+            for (int i = 0; i < size; i++)
+            {
+                Stack_push(stack, PyList_GET_ITEM(candidate, i));
+            }
+        }
+    }
+    free(stack);
+    return obj;
+}
+
 static PyMethodDef case_methods[] = {
-    {"_to_snake_case", camelcase_to_snake_case, METH_VARARGS, "convert camel case to snake case string"},
-    {"_to_camel_case", snakecase_to_camel_case, METH_VARARGS, "convert snake case to camel case string"},
+    {"_to_snake_case", camelcase_to_snake_case, METH_VARARGS, PyDoc_STR("convert camel case to snake case string")},
+    {"_to_camel_case", snakecase_to_camel_case, METH_VARARGS, PyDoc_STR("convert snake case to camel case string")},
+    {"_camelize", camelize, METH_VARARGS, PyDoc_STR("convert snake case dict/list to camel case dict/list")},
+    {"_decamelize", decamelize, METH_VARARGS, PyDoc_STR("convert snake case dict/list to camel case dict/list")},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
 static struct PyModuleDef _case_module = {
     PyModuleDef_HEAD_INIT,
-    "_camelcase",
+    "_case",
     NULL,
     -1,
     case_methods};

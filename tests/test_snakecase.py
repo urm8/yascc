@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from yascc import snakecase
@@ -20,4 +22,7 @@ def test_camelize_benchmark(benchmark, decamelized_list_of_dict, impl):
 
 
 def test_decamelize_list_of_dict(decamelized_list_of_dict, camelized_list_of_dict) -> None:
-    assert snakecase.camelize(decamelized_list_of_dict) == camelized_list_of_dict
+    got = snakecase.camelize(decamelized_list_of_dict)
+    assert (
+        got == camelized_list_of_dict
+    ), f"{json.dumps(decamelized_list_of_dict, indent=4)} != {json.dumps(camelized_list_of_dict, indent=4)}"

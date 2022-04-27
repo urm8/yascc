@@ -17,7 +17,11 @@ if sys.platform == "win32":
 else:
     args.append("-O3")
 
-ext_modules = [Extension("_case", sources=["src/yascc/case.c"], extra_compile_args=args)]
+ext_modules = [
+    Extension(
+        "_case", sources=["src/yascc/case.c", "src/yascc/stack.c"], include_dirs=["src/yascc"], extra_compile_args=args
+    )
+]
 
 
 class ExtBuilder(build_ext):
