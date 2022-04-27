@@ -11,8 +11,13 @@ def test_decamelize(camelized_dict: dict, decamelized_dict: dict) -> None:
 
 
 @pytest.mark.parametrize("impl", [decamelize, underscoreize], ids=["c", "drf"])
-def test_decamelize_benchmark(benchmark, camelized_list_of_dict, impl):
+def test_decamelize_list_benchmark(benchmark, camelized_list_of_dict, impl):
     benchmark(impl, camelized_list_of_dict)
+
+
+@pytest.mark.parametrize("impl", [decamelize, underscoreize], ids=["c", "drf"])
+def test_decamelize_benchmark(benchmark, camelized_dict, impl):
+    benchmark(impl, camelized_dict)
 
 
 def test_decamelize_nested_dict(camelized_nested_dict, decamelized_nested_dict) -> None:
