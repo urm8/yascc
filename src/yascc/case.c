@@ -72,15 +72,16 @@ static PyObject *camelize(PyObject *self, PyObject *args)
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
+    Py_INCREF(obj);
     Stack_T stack = Stack_init();
-    Stack_push(stack, Py_NewRef(obj));
+    Stack_push(stack, obj);
     while (!Stack_empty(stack))
     {
         PyObject *candidate = (PyObject *)Stack_pop(stack);
         if (PyDict_Check(candidate))
         {
             PyObject *keys = PyDict_Keys(candidate);
-            int keys_len = PySequence_Length(keys);
+            int keys_len = PyList_GET_SIZE(keys);
             for (int i = 0; i < keys_len; i++)
             {
                 PyObject *key = PyList_GET_ITEM(keys, i);
@@ -91,7 +92,7 @@ static PyObject *camelize(PyObject *self, PyObject *args)
                     const char *key_str = PyUnicode_AsUTF8(key);
                     to_camel_case((char *)key_str);
                     PyObject *new_key = PyUnicode_FromString(buf);
-                    value = Py_NewRef(value);
+                    Py_INCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
                     Py_DECREF(new_key);
@@ -121,15 +122,16 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
+    Py_INCREF(obj);
     Stack_T stack = Stack_init();
-    Stack_push(stack, Py_NewRef(obj));
+    Stack_push(stack, obj);
     while (!Stack_empty(stack))
     {
         PyObject *candidate = (PyObject *)Stack_pop(stack);
         if (PyDict_Check(candidate))
         {
             PyObject *keys = PyDict_Keys(candidate);
-            int keys_len = PySequence_Length(keys);
+            int keys_len = PyList_GET_SIZE(keys);
             for (int i = 0; i < keys_len; i++)
             {
                 PyObject *key = PyList_GET_ITEM(keys, i);
@@ -140,7 +142,7 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
                     const char *key_str = PyUnicode_AsUTF8(key);
                     to_snake_case((char *)key_str);
                     PyObject *new_key = PyUnicode_FromString(buf);
-                    value = Py_NewRef(value);
+                    Py_INCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
                     Py_DECREF(new_key);
