@@ -1,13 +1,31 @@
 import pytest
 
 from yascc.camelcase import decamelize
+from yascc.camelcase import to_snake_case
 
 from .django_rest_framework_camelcase import underscoreize
 
 
-def test_decamelize(camelized_dict: dict, decamelized_dict: dict) -> None:
+def test_to_snake_case():
+    assert to_snake_case("testString") == "test_string"
+
+
+def test_decamelize_dict(camelized_dict: dict, decamelized_dict: dict) -> None:
     got = decamelize(camelized_dict)
     assert got == decamelized_dict
+
+
+@pytest.mark.parametrize(
+    "arg,expected",
+    [
+        (None, None),
+        ([None], [None]),
+        ([{None: None}], [{None: None}]),
+        ([{"someValue": None}], [{"some_value": None}]),
+    ],
+)
+def test_decamelize(arg, expected):
+    assert decamelize(arg) == expected
 
 
 @pytest.mark.parametrize("impl", [decamelize, underscoreize], ids=["c", "drf"])

@@ -72,7 +72,7 @@ static PyObject *camelize(PyObject *self, PyObject *args)
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
-    Py_INCREF(obj);
+    Py_XINCREF(obj);
     Stack_T stack = Stack_init();
     Stack_push(stack, obj);
     while (!Stack_empty(stack))
@@ -92,11 +92,11 @@ static PyObject *camelize(PyObject *self, PyObject *args)
                     const char *key_str = PyUnicode_AsUTF8(key);
                     to_camel_case((char *)key_str);
                     PyObject *new_key = PyUnicode_FromString(buf);
-                    Py_INCREF(value);
+                    Py_XINCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
                     Py_DECREF(new_key);
-                    Py_DECREF(value);
+                    Py_XDECREF(value);
                 }
                 if (PyDict_Check(value) || PyList_Check(value))
                 {
@@ -122,7 +122,7 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
-    Py_INCREF(obj);
+    Py_XINCREF(obj);
     Stack_T stack = Stack_init();
     Stack_push(stack, obj);
     while (!Stack_empty(stack))
@@ -142,18 +142,18 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
                     const char *key_str = PyUnicode_AsUTF8(key);
                     to_snake_case((char *)key_str);
                     PyObject *new_key = PyUnicode_FromString(buf);
-                    Py_INCREF(value);
+                    Py_XINCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
                     Py_DECREF(new_key);
-                    Py_DECREF(value);
+                    Py_XDECREF(value);
                 }
                 if (PyDict_Check(value) || PyList_Check(value))
                 {
                     Stack_push(stack, value);
                 }
             }
-            Py_DECREF(keys);
+            Py_XDECREF(keys);
         }
         else if (PyList_Check(candidate))
         {
