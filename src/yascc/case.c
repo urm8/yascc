@@ -12,12 +12,10 @@ typedef enum
     true
 } bool;
 
-static char buf[4096];
 static const char del = '_';
 
-static inline void to_snake_case(char *in)
+static inline void to_snake_case(const char *in, char *target)
 {
-    char *target = buf;
     char ch;
     do
     {
@@ -25,15 +23,15 @@ static inline void to_snake_case(char *in)
         if (65 <= ch && ch <= 90)
         {
             *(target++) = '_';
+            // to lower case
             ch |= 0b1100000;
         }
         *(target++) = ch;
     } while (ch);
 }
 
-static inline void to_camel_case(char *in)
+static inline void to_camel_case(const char *in, char *target)
 {
-    char *target = buf;
     char ch;
     do
     {
@@ -47,21 +45,51 @@ static inline void to_camel_case(char *in)
 
 static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
 {
-    char *camel_case_str;
-    if (!PyArg_ParseTuple(args, "s", &camel_case_str))
+    const char *camel_case_str;
+    Py_ssize_t len;
+    if (!PyArg_ParseTuple(args, "s#", &camel_case_str, &len))
         return NULL;
-    to_snake_case(camel_case_str);
+    char *buf = malloc(sizeof(char) * ((int)(len * 2)));
+    to_snake_case(camel_case_str, buf);
     PyObject *obj = PyUnicode_FromString(buf);
+    free(buf);
+    return obj;
+}
+
+static inline PyObject *camelcase_string_to_snake_case(PyObject *string)
+{
+    /* Accepts python str object, outputs same object, but snakecased. */
+    Py_ssize_t len;
+    const char *in_str = PyUnicode_AsUTF8AndSize(string, &len);
+    char *out_str = malloc(sizeof(char) * ((int)(len * 2)));
+    to_snake_case(in_str, out_str);
+    PyObject *obj = PyUnicode_FromString(out_str);
+    free(out_str);
     return obj;
 }
 
 static PyObject *snakecase_to_camel_case(PyObject *self, PyObject *args)
 {
-    char *snake_case_str;
-    if (!PyArg_ParseTuple(args, "s", &snake_case_str))
+    const char *snake_case_str;
+    Py_ssize_t len;
+    if (!PyArg_ParseTuple(args, "s#", &snake_case_str, &len))
         return NULL;
-    to_camel_case(snake_case_str);
+    char *buf = malloc(sizeof(char) * ((int)(len * 2)));
+    to_camel_case(snake_case_str, buf);
     PyObject *obj = PyUnicode_FromString(buf);
+    free(buf);
+    return obj;
+}
+
+static inline PyObject *snakecase_string_to_camel_case(PyObject *string)
+{
+    /* Accepts python str object, outputs same object, but camelcased. */
+    Py_ssize_t len;
+    const char *in_str = PyUnicode_AsUTF8AndSize(string, &len);
+    char *out_str = malloc(sizeof(char) * ((int)(len * 2)));
+    to_camel_case(in_str, out_str);
+    PyObject *obj = PyUnicode_FromString(out_str);
+    free(out_str);
     return obj;
 }
 
@@ -87,9 +115,7 @@ static PyObject *camelize(PyObject *self, PyObject *args)
 
                 if (PyUnicode_Check(key))
                 {
-                    const char *key_str = PyUnicode_AsUTF8(key);
-                    to_camel_case((char *)key_str);
-                    PyObject *new_key = PyUnicode_FromString(buf);
+                    PyObject *new_key = snakecase_string_to_camel_case(key);
                     Py_XINCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
@@ -137,9 +163,7 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
 
                 if (PyUnicode_Check(key))
                 {
-                    const char *key_str = PyUnicode_AsUTF8(key);
-                    to_snake_case((char *)key_str);
-                    PyObject *new_key = PyUnicode_FromString(buf);
+                    PyObject *new_key = camelcase_string_to_snake_case(key);
                     Py_XINCREF(value);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);

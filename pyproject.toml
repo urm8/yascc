@@ -50,7 +50,7 @@ build = "*"
 
 [project]
 name = "yascc"
-version = "0.3.15"
+version = "0.3.16"
 description = "Yet another string case converter"
 readme = "README.md"
 authors = [{ name = "urm8", email = "arctgisnil@gmail.com" }]
