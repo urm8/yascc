@@ -26,7 +26,8 @@ def test_camelize_nested_dict(decamelized_nested_dict, camelized_nested_dict) ->
     ],
 )
 def test_camelize(arg, expected):
-    assert snakecase.camelize(arg) == expected
+    got = snakecase.camelize(arg)
+    assert got == expected
 
 
 @pytest.mark.parametrize("impl", [snakecase.camelize, camelize], ids=["c", "drf"])

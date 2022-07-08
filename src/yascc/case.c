@@ -49,7 +49,7 @@ static PyObject *camelcase_to_snake_case(PyObject *self, PyObject *args)
     Py_ssize_t len;
     if (!PyArg_ParseTuple(args, "s#", &camel_case_str, &len))
         return NULL;
-    char *buf = malloc(sizeof(char) * ((int)(len * 2)));
+    char *buf = malloc(sizeof(char) * (len * 2));
     to_snake_case(camel_case_str, buf);
     PyObject *obj = PyUnicode_FromString(buf);
     free(buf);
@@ -61,7 +61,7 @@ static inline PyObject *camelcase_string_to_snake_case(PyObject *string)
     /* Accepts python str object, outputs same object, but snakecased. */
     Py_ssize_t len;
     const char *in_str = PyUnicode_AsUTF8AndSize(string, &len);
-    char *out_str = malloc(sizeof(char) * ((int)(len * 2)));
+    char *out_str = malloc(sizeof(char) * (len * 2));
     to_snake_case(in_str, out_str);
     PyObject *obj = PyUnicode_FromString(out_str);
     free(out_str);
@@ -74,7 +74,7 @@ static PyObject *snakecase_to_camel_case(PyObject *self, PyObject *args)
     Py_ssize_t len;
     if (!PyArg_ParseTuple(args, "s#", &snake_case_str, &len))
         return NULL;
-    char *buf = malloc(sizeof(char) * ((int)(len * 2)));
+    char *buf = malloc(sizeof(char) * (len * 2));
     to_camel_case(snake_case_str, buf);
     PyObject *obj = PyUnicode_FromString(buf);
     free(buf);
@@ -86,7 +86,7 @@ static inline PyObject *snakecase_string_to_camel_case(PyObject *string)
     /* Accepts python str object, outputs same object, but camelcased. */
     Py_ssize_t len;
     const char *in_str = PyUnicode_AsUTF8AndSize(string, &len);
-    char *out_str = malloc(sizeof(char) * ((int)(len * 2)));
+    char *out_str = malloc(sizeof(char) * (len * 2));
     to_camel_case(in_str, out_str);
     PyObject *obj = PyUnicode_FromString(out_str);
     free(out_str);
@@ -107,27 +107,30 @@ static PyObject *camelize(PyObject *self, PyObject *args)
         if (PyDict_Check(candidate))
         {
             PyObject *keys = PyDict_Keys(candidate);
+            Py_XINCREF(keys);
             int keys_len = PyList_GET_SIZE(keys);
             for (int i = 0; i < keys_len; i++)
             {
                 PyObject *key = PyList_GET_ITEM(keys, i);
+                Py_XINCREF(key);
                 PyObject *value = PyDict_GetItem(candidate, key);
-
+                Py_XINCREF(value);
                 if (PyUnicode_Check(key))
                 {
                     PyObject *new_key = snakecase_string_to_camel_case(key);
-                    Py_XINCREF(value);
+                    Py_XINCREF(new_key);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
-                    Py_DECREF(new_key);
-                    Py_XDECREF(value);
                 }
                 if (PyDict_Check(value) || PyList_Check(value))
                 {
+                    Py_XINCREF(value);
                     Stack_push(stack, value);
                 }
+                Py_XDECREF(key);
+                Py_XDECREF(value);
             }
-            Py_DECREF(keys);
+            Py_XDECREF(keys);
         }
         else if (PyList_Check(candidate))
         {
@@ -159,23 +162,25 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
             for (int i = 0; i < keys_len; i++)
             {
                 PyObject *key = PyList_GET_ITEM(keys, i);
+                Py_XINCREF(key);
                 PyObject *value = PyDict_GetItem(candidate, key);
+                Py_XINCREF(value);
 
                 if (PyUnicode_Check(key))
                 {
                     PyObject *new_key = camelcase_string_to_snake_case(key);
-                    Py_XINCREF(value);
+                    Py_XINCREF(new_key);
                     PyDict_DelItem(candidate, key);
                     PyDict_SetItem(candidate, new_key, value);
-                    Py_DECREF(new_key);
-                    Py_XDECREF(value);
                 }
                 if (PyDict_Check(value) || PyList_Check(value))
                 {
+                    Py_XINCREF(value);
                     Stack_push(stack, value);
                 }
+                Py_XDECREF(key);
+                Py_XDECREF(value);
             }
-            Py_XDECREF(keys);
         }
         else if (PyList_Check(candidate))
         {
