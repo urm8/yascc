@@ -39,6 +39,11 @@ def decamelized_list_of_dict(decamelized_nested_dict):
 
 
 @pytest.fixture
+def decamelized_list_of_dicts(decamelized_nested_dict):
+    return [deepcopy(decamelized_nested_dict) for _ in range(1000)]
+
+
+@pytest.fixture
 def camelized_nested_dict():
     return deepcopy(
         {
@@ -61,3 +66,9 @@ def camelized_nested_dict():
 @pytest.fixture
 def camelized_list_of_dict(camelized_nested_dict):
     return [camelized_nested_dict]
+
+
+@pytest.fixture
+def camelized_list_of_dicts(camelized_nested_dict):
+    """to test impl with mb slow traversal."""
+    return [deepcopy(camelized_nested_dict) for _ in range(1000)]

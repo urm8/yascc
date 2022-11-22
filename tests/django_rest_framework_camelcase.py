@@ -12,7 +12,7 @@ def underscore_to_camel(match):
         return group[1].upper()
 
 
-def camelize(data, **options):
+def drf_camelize(data, **options):
     # Handle lazy translated strings.
     ignore_fields = options.get("ignore_fields") or ()
     if isinstance(data, dict):
@@ -23,12 +23,12 @@ def camelize(data, **options):
             else:
                 new_key = key
             if key not in ignore_fields and new_key not in ignore_fields:
-                new_dict[new_key] = camelize(value, **options)
+                new_dict[new_key] = drf_camelize(value, **options)
             else:
                 new_dict[new_key] = value
         return new_dict
     if is_iterable(data) and not isinstance(data, str):
-        return [camelize(item, **options) for item in data]
+        return [drf_camelize(item, **options) for item in data]
     return data
 
 
@@ -49,7 +49,7 @@ def _get_iterable(data):
     return data.items()
 
 
-def underscoreize(data, **options):
+def drf_decamelize(data, **options):
     if isinstance(data, dict):
         new_dict = {}
         for key, value in _get_iterable(data):
@@ -60,7 +60,7 @@ def underscoreize(data, **options):
             new_dict[new_key] = value
         return new_dict
     if is_iterable(data):
-        return [underscoreize(item, **options) for item in data]
+        return [drf_decamelize(item, **options) for item in data]
 
     return data
 

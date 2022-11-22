@@ -3,7 +3,7 @@ import pytest
 from yascc.camelcase import decamelize
 from yascc.camelcase import to_snake_case
 
-from .django_rest_framework_camelcase import underscoreize
+from .django_rest_framework_camelcase import drf_decamelize
 
 
 def test_to_snake_case():
@@ -28,12 +28,17 @@ def test_decamelize(arg, expected):
     assert decamelize(arg) == expected
 
 
-@pytest.mark.parametrize("impl", [decamelize, underscoreize], ids=["c", "drf"])
+@pytest.mark.parametrize("impl", [decamelize, drf_decamelize], ids=["c", "drf"])
 def test_decamelize_list_benchmark(benchmark, camelized_list_of_dict, impl):
     benchmark(impl, camelized_list_of_dict)
 
 
-@pytest.mark.parametrize("impl", [decamelize, underscoreize], ids=["c", "drf"])
+@pytest.mark.parametrize("impl", [decamelize, drf_decamelize], ids=["c", "drf"])
+def test_decamelize_list_benchmark_1000_nested(benchmark, camelized_list_of_dicts, impl):
+    benchmark(impl, camelized_list_of_dicts)
+
+
+@pytest.mark.parametrize("impl", [decamelize, drf_decamelize], ids=["c", "drf"])
 def test_decamelize_benchmark(benchmark, camelized_dict, impl):
     benchmark(impl, camelized_dict)
 

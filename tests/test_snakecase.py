@@ -4,7 +4,7 @@ import pytest
 
 from yascc import snakecase
 
-from .django_rest_framework_camelcase import camelize
+from .django_rest_framework_camelcase import drf_camelize
 
 
 def test_camelize_dict(camelized_dict, decamelized_dict) -> None:
@@ -30,12 +30,17 @@ def test_camelize(arg, expected):
     assert got == expected
 
 
-@pytest.mark.parametrize("impl", [snakecase.camelize, camelize], ids=["c", "drf"])
+@pytest.mark.parametrize("impl", [snakecase.camelize, drf_camelize], ids=["c", "drf"])
 def test_camelize_list_benchmark(benchmark, decamelized_list_of_dict, impl):
     benchmark(impl, decamelized_list_of_dict)
 
 
-@pytest.mark.parametrize("impl", [snakecase.camelize, camelize], ids=["c", "drf"])
+@pytest.mark.parametrize("impl", [snakecase.camelize, drf_camelize], ids=["c", "drf"])
+def test_camelize_list_benchmark_1000_nested(benchmark, decamelized_list_of_dicts, impl):
+    benchmark(impl, decamelized_list_of_dicts)
+
+
+@pytest.mark.parametrize("impl", [snakecase.camelize, drf_camelize], ids=["c", "drf"])
 def test_camelize_benchmark(benchmark, decamelized_dict, impl):
     benchmark(impl, decamelized_dict)
 

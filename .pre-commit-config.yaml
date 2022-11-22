@@ -1,5 +1,5 @@
 ---
-exclude: migrations|templates|totals_prices_sql.md
+exclude: migrations|templates|venv|src/_setup_interactive_console
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
@@ -69,3 +69,7 @@ repos:
           - flake8-todo
           - radon
         always_run: true
+  - repo: https://github.com/pdm-project/pdm
+    rev: "2.2.1" # a PDM release exposing the hook
+    hooks:
+      - id: pdm-lock-check
