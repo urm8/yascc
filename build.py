@@ -33,7 +33,9 @@ class ExtBuilder(build_ext):
 
     def build_extension(self, ext):
         try:
+            log.info("build extension start")
             build_ext.build_extension(self, ext)
+            log.info("build extension success")
         except (
             CCompilerError,
             DistutilsExecError,

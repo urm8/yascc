@@ -3,7 +3,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stack.h>
 #include <Python.h>
 
 typedef enum
@@ -93,13 +92,70 @@ static inline PyObject *snakecase_string_to_camel_case(PyObject *string)
     return obj;
 }
 
+/* stupid dynamic stack
+
+push -> size = 0 > 1;
+push -> size = 1 > 2;
+pop  -> size = 2 > 1;
+pop  -> size = 1 > 0;
+ */
+struct Stack
+{
+    PyObject **array;
+    size_t size;
+    size_t capacity;
+};
+
+typedef struct Stack* Stack_T;
+
+Stack_T Stack_init(int size)
+{
+    Stack_T stack;
+    stack = (Stack_T)malloc(sizeof(struct Stack));
+    stack->array = malloc(sizeof(PyObject *) * size);
+    stack->size = 0;
+    stack->capacity = size;
+    return stack;
+}
+
+int Stack_empty(Stack_T stack)
+{
+    return stack->size == 0;
+}
+
+void Stack_push(Stack_T stack, PyObject *elem)
+{
+    if (stack->size == stack->capacity)
+    {
+        stack->capacity *= 2;
+        stack->array = realloc(stack->array, stack->capacity * sizeof(PyObject *));
+    }
+    stack->array[stack->size++] = elem;
+}
+
+PyObject *Stack_pop(Stack_T stack)
+{
+    PyObject *obj = stack->array[--stack->size];
+    stack->array[stack->size] = NULL;
+    return obj;
+}
+
+void Stack_free(Stack_T stack)
+{
+    free(stack->array);
+    stack->array = NULL;
+    stack->size = stack->capacity = 0;
+    free(stack);
+}
+
+
 static PyObject *camelize(PyObject *self, PyObject *args)
 {
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
     Py_XINCREF(obj);
-    Stack_T stack = Stack_init();
+    Stack_T stack = Stack_init(100);
     Stack_push(stack, obj);
     while (!Stack_empty(stack))
     {
@@ -141,20 +197,21 @@ static PyObject *camelize(PyObject *self, PyObject *args)
             }
         }
     }
-    free(stack);
+    Stack_free(stack);
     return obj;
 }
+
 static PyObject *decamelize(PyObject *self, PyObject *args)
 {
     PyObject *obj;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
     Py_XINCREF(obj);
-    Stack_T stack = Stack_init();
+    Stack_T stack = Stack_init(100);
     Stack_push(stack, obj);
     while (!Stack_empty(stack))
     {
-        PyObject *candidate = (PyObject *)Stack_pop(stack);
+        PyObject *candidate = Stack_pop(stack);
         if (PyDict_Check(candidate))
         {
             PyObject *keys = PyDict_Keys(candidate);
@@ -165,7 +222,6 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
                 Py_XINCREF(key);
                 PyObject *value = PyDict_GetItem(candidate, key);
                 Py_XINCREF(value);
-
                 if (PyUnicode_Check(key))
                 {
                     PyObject *new_key = camelcase_string_to_snake_case(key);
@@ -191,7 +247,7 @@ static PyObject *decamelize(PyObject *self, PyObject *args)
             }
         }
     }
-    free(stack);
+    Stack_free(stack);
     return obj;
 }
 

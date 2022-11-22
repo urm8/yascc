@@ -1,7 +1,6 @@
 import logging
 import sys
 from distutils.command.build_ext import build_ext
-from distutils.core import Extension
 from distutils.errors import CCompilerError
 from distutils.errors import DistutilsExecError
 from distutils.errors import DistutilsPlatformError
@@ -17,11 +16,7 @@ if sys.platform == "win32":
 else:
     args.append("-O3")
 
-ext_modules = [
-    Extension(
-        "_case", sources=["src/yascc/case.c", "src/yascc/stack.c"], include_dirs=["src/yascc"], extra_compile_args=args
-    )
-]
+ext_modules = [Extension("_case", sources=["src/yascc/case.c"], include_dirs=["src/yascc"], extra_compile_args=args)]
 
 
 class ExtBuilder(build_ext):
