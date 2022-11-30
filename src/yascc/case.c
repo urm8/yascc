@@ -180,12 +180,7 @@ void Stack_free(Stack_T stack)
     stack->size = stack->capacity = 0;
     free(stack);
 }
-// static PyObject *apply(PyObject *args, void mutator(const char*, char*)) {
-
-// };
-
-static PyObject *camelize(PyObject *self, PyObject *args)
-{
+static PyObject *mutate(PyObject *args, void mutator(const char*, char*)) {
     Py_ssize_t n = 0, len = 0;
     PyObject *obj, *ret;
     if (!PyArg_ParseTuple(args, "O", &obj))
@@ -223,7 +218,7 @@ static PyObject *camelize(PyObject *self, PyObject *args)
                 {
                     const char *temp = PyUnicode_AsUTF8AndSize(key, &len);
                     StringBuf_update_bounds(buf, len);
-                    to_camel_case(temp, buf->string);
+                    mutator(temp, buf->string);
                     new_key = PyUnicode_FromString(buf->string);
                     if (PyDict_Check(value))
                     {
@@ -282,73 +277,16 @@ static PyObject *camelize(PyObject *self, PyObject *args)
     Stack_free(stack);
     StringBuf_free(buf);
     return ret;
+};
+
+static PyObject *camelize(PyObject *self, PyObject *args)
+{
+    return mutate(args, *to_camel_case);
 }
 
 static PyObject *decamelize(PyObject *self, PyObject *args)
 {
-Py_ssize_t n = 0, len = 0;
-    PyObject *obj, *ret;
-    if (!PyArg_ParseTuple(args, "O", &obj))
-        return NULL;
-    if (PyDict_Check(obj))
-    {
-        ret = PyDict_New();
-        Py_XINCREF(ret);
-    }
-    else if (PyList_Check(obj))
-    {
-        ret = PyList_New(PyList_GET_SIZE(obj));
-        Py_XINCREF(ret);
-    }
-    else
-    {
-        return obj;
-    }
-    PyObject *source, *target, *key, *value, *new_key;
-    StringBuf_T buf = StringBuf_init(50);
-    Stack_T stack = Stack_init(100);
-    Stack_push(stack, obj);
-    Stack_push(stack, ret);
-    while (!Stack_empty(stack))
-    {
-        PyObject *candidate = Stack_pop(stack);
-        if (PyDict_Check(candidate))
-        {
-            PyObject *keys = PyDict_Keys(candidate);
-            int keys_len = PyList_GET_SIZE(keys);
-            for (int i = 0; i < keys_len; i++)
-            {
-                PyObject *key = PyList_GET_ITEM(keys, i);
-                Py_XINCREF(key);
-                PyObject *value = PyDict_GetItem(candidate, key);
-                Py_XINCREF(value);
-                if (PyUnicode_Check(key))
-                {
-                    PyObject *new_key = camelcase_string_to_snake_case(key);
-                    Py_XINCREF(new_key);
-                    PyDict_DelItem(candidate, key);
-                    PyDict_SetItem(candidate, new_key, value);
-                }
-                if (PyDict_Check(value) || PyList_Check(value))
-                {
-                    Py_XINCREF(value);
-                    Stack_push(stack, value);
-                }
-                Py_XDECREF(key);
-                Py_XDECREF(value);
-            }
-        }
-        else if (PyList_Check(candidate))
-        {
-            Py_ssize_t size = PyList_GET_SIZE(candidate);
-            for (int i = 0; i < size; i++)
-            {
-                Stack_push(stack, PyList_GET_ITEM(candidate, i));
-            }
-        }
-    }
-    Stack_free(stack);
-    return obj;
+    return mutate(args, *to_snake_case);
 }
 
 static PyMethodDef case_methods[] = {
