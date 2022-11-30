@@ -222,6 +222,7 @@ static PyObject *mutate(PyObject *args, void mutator(const char *, char *))
                     StringBuf_update_bounds(buf, len);
                     mutator(temp, buf->string);
                     new_key = PyUnicode_FromString(buf->string);
+                    Py_XINCREF(new_key);
                     if (PyDict_Check(value))
                     {
                         Stack_push(stack, value);
