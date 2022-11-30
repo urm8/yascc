@@ -92,6 +92,39 @@ static inline PyObject *snakecase_string_to_camel_case(PyObject *string)
     return obj;
 }
 
+struct StringBuf
+{
+    char *string;
+    size_t size;
+};
+
+typedef struct StringBuf *StringBuf_T;
+
+StringBuf_T StringBuf_init(int size)
+{
+    StringBuf_T buf;
+    buf = (StringBuf_T)malloc(sizeof(struct StringBuf));
+    buf->string = malloc(sizeof(char *) * size);
+    buf->size = size;
+    return buf;
+}
+
+void StringBuf_update_bounds(StringBuf_T buf, size_t size) {
+    if (buf->size < size) {
+        buf->size *= 2;
+        buf->string = realloc(buf->string, buf->size * sizeof(char *));
+    }
+}
+
+void StringBuf_free(StringBuf_T buf)
+{
+    free(buf->string);
+    buf->string = NULL;
+    buf->size = 0;
+    free(buf);
+}
+
+
 /* stupid dynamic stack
 
 push -> size = 0 > 1;
@@ -106,7 +139,7 @@ struct Stack
     size_t capacity;
 };
 
-typedef struct Stack* Stack_T;
+typedef struct Stack *Stack_T;
 
 Stack_T Stack_init(int size)
 {
@@ -147,68 +180,135 @@ void Stack_free(Stack_T stack)
     stack->size = stack->capacity = 0;
     free(stack);
 }
+// static PyObject *apply(PyObject *args, void mutator(const char*, char*)) {
 
+// };
 
 static PyObject *camelize(PyObject *self, PyObject *args)
 {
-    PyObject *obj;
+    Py_ssize_t n = 0, len = 0;
+    PyObject *obj, *ret;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
-    Py_XINCREF(obj);
+    if (PyDict_Check(obj))
+    {
+        ret = PyDict_New();
+        Py_XINCREF(ret);
+    }
+    else if (PyList_Check(obj))
+    {
+        ret = PyList_New(PyList_GET_SIZE(obj));
+        Py_XINCREF(ret);
+    }
+    else
+    {
+        return obj;
+    }
+    PyObject *source, *target, *key, *value, *new_key;
+    StringBuf_T buf = StringBuf_init(50);
     Stack_T stack = Stack_init(100);
     Stack_push(stack, obj);
+    Stack_push(stack, ret);
     while (!Stack_empty(stack))
     {
-        PyObject *candidate = (PyObject *)Stack_pop(stack);
-        if (PyDict_Check(candidate))
+        target = (PyObject *)Stack_pop(stack);
+        source = (PyObject *)Stack_pop(stack);
+
+        if (PyDict_Check(source))
         {
-            PyObject *keys = PyDict_Keys(candidate);
-            Py_XINCREF(keys);
-            int keys_len = PyList_GET_SIZE(keys);
-            for (int i = 0; i < keys_len; i++)
+            n = 0;
+            while (PyDict_Next(source, &n, &key, &value))
             {
-                PyObject *key = PyList_GET_ITEM(keys, i);
-                Py_XINCREF(key);
-                PyObject *value = PyDict_GetItem(candidate, key);
-                Py_XINCREF(value);
                 if (PyUnicode_Check(key))
                 {
-                    PyObject *new_key = snakecase_string_to_camel_case(key);
-                    Py_XINCREF(new_key);
-                    PyDict_DelItem(candidate, key);
-                    PyDict_SetItem(candidate, new_key, value);
+                    const char *temp = PyUnicode_AsUTF8AndSize(key, &len);
+                    StringBuf_update_bounds(buf, len);
+                    to_camel_case(temp, buf->string);
+                    new_key = PyUnicode_FromString(buf->string);
+                    if (PyDict_Check(value))
+                    {
+                        Stack_push(stack, value);
+                        obj = PyDict_New();
+                        Py_XINCREF(obj);
+                        Stack_push(stack, obj);
+                        PyDict_SetItem(target, new_key, obj);
+                    }
+                    else if (PyList_Check(value))
+                    {
+                        Stack_push(stack, value);
+                        obj = PyList_New(PyList_GET_SIZE(value));
+                        Py_XINCREF(obj);
+                        Stack_push(stack, obj);
+                        PyDict_SetItem(target, new_key, obj);
+                    }
+                    else
+                    {
+                        PyDict_SetItem(target, new_key, value);
+                    }
+                } else {
+                    PyDict_SetItem(target, key, value);
                 }
-                if (PyDict_Check(value) || PyList_Check(value))
-                {
-                    Py_XINCREF(value);
-                    Stack_push(stack, value);
-                }
-                Py_XDECREF(key);
-                Py_XDECREF(value);
             }
-            Py_XDECREF(keys);
         }
-        else if (PyList_Check(candidate))
+        else if (PyList_Check(source))
         {
-            Py_ssize_t size = PyList_GET_SIZE(candidate);
-            for (int i = 0; i < size; i++)
+            n = PyList_GET_SIZE(source);
+            for (Py_ssize_t i = 0; i < n; i++)
             {
-                Stack_push(stack, PyList_GET_ITEM(candidate, i));
+                value = PyList_GET_ITEM(source, i);
+                if (PyDict_Check(value))
+                {
+                    Stack_push(stack, value);
+                    obj = PyDict_New();
+                    Py_XINCREF(obj);
+                    Stack_push(stack, obj);
+                    PyList_SET_ITEM(target, i, obj);
+                }
+                else if (PyList_Check(value))
+                {
+                    Stack_push(stack, value);
+                    obj = PyList_New(PyList_GET_SIZE(value));
+                    Py_XINCREF(obj);
+                    Stack_push(stack, obj);
+                    PyList_SET_ITEM(target, i, obj);
+                }
+                else
+                {
+                    PyList_SET_ITEM(target, i, value);
+                }
             }
         }
     }
     Stack_free(stack);
-    return obj;
+    StringBuf_free(buf);
+    return ret;
 }
 
 static PyObject *decamelize(PyObject *self, PyObject *args)
 {
-    PyObject *obj;
+Py_ssize_t n = 0, len = 0;
+    PyObject *obj, *ret;
     if (!PyArg_ParseTuple(args, "O", &obj))
         return NULL;
-    Py_XINCREF(obj);
+    if (PyDict_Check(obj))
+    {
+        ret = PyDict_New();
+        Py_XINCREF(ret);
+    }
+    else if (PyList_Check(obj))
+    {
+        ret = PyList_New(PyList_GET_SIZE(obj));
+        Py_XINCREF(ret);
+    }
+    else
+    {
+        return obj;
+    }
+    PyObject *source, *target, *key, *value, *new_key;
+    StringBuf_T buf = StringBuf_init(50);
     Stack_T stack = Stack_init(100);
     Stack_push(stack, obj);
+    Stack_push(stack, ret);
     while (!Stack_empty(stack))
     {
         PyObject *candidate = Stack_pop(stack);
