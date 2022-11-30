@@ -109,8 +109,10 @@ StringBuf_T StringBuf_init(int size)
     return buf;
 }
 
-void StringBuf_update_bounds(StringBuf_T buf, size_t size) {
-    if (buf->size < size) {
+void StringBuf_update_bounds(StringBuf_T buf, size_t size)
+{
+    if (buf->size < size)
+    {
         buf->size *= 2;
         buf->string = realloc(buf->string, buf->size * sizeof(char *));
     }
@@ -123,7 +125,6 @@ void StringBuf_free(StringBuf_T buf)
     buf->size = 0;
     free(buf);
 }
-
 
 /* stupid dynamic stack
 
@@ -180,7 +181,8 @@ void Stack_free(Stack_T stack)
     stack->size = stack->capacity = 0;
     free(stack);
 }
-static PyObject *mutate(PyObject *args, void mutator(const char*, char*)) {
+static PyObject *mutate(PyObject *args, void mutator(const char *, char *))
+{
     Py_ssize_t n = 0, len = 0;
     PyObject *obj, *ret;
     if (!PyArg_ParseTuple(args, "O", &obj))
@@ -240,7 +242,25 @@ static PyObject *mutate(PyObject *args, void mutator(const char*, char*)) {
                     {
                         PyDict_SetItem(target, new_key, value);
                     }
-                } else {
+                }
+                else if (PyDict_Check(value))
+                {
+                    Stack_push(stack, value);
+                    obj = PyDict_New();
+                    Py_XINCREF(obj);
+                    Stack_push(stack, obj);
+                    PyDict_SetItem(target, key, obj);
+                }
+                else if (PyList_Check(value))
+                {
+                    Stack_push(stack, value);
+                    obj = PyList_New(PyList_GET_SIZE(value));
+                    Py_XINCREF(obj);
+                    Stack_push(stack, obj);
+                    PyDict_SetItem(target, key, obj);
+                }
+                else
+                {
                     PyDict_SetItem(target, key, value);
                 }
             }
