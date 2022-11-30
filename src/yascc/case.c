@@ -216,6 +216,8 @@ static PyObject *mutate(PyObject *args, void mutator(const char *, char *))
             n = 0;
             while (PyDict_Next(source, &n, &key, &value))
             {
+                value = PyObject_GetItem(source, key);
+                Py_XINCREF(value);
                 if (PyUnicode_Check(key))
                 {
                     const char *temp = PyUnicode_AsUTF8AndSize(key, &len);
